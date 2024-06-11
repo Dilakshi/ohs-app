@@ -1,6 +1,5 @@
 package com.ohs.integrationservice.grpc;
 
-import com.ohs.integrationservice.model.OrderData;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import order.OrderServiceGrpc;
