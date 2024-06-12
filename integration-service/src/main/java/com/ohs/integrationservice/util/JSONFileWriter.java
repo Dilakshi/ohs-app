@@ -2,12 +2,14 @@ package com.ohs.integrationservice.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.ohs.integrationservice.model.ProcessedOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 
 @Component
@@ -27,23 +29,15 @@ public class JSONFileWriter {
         }
 
         ObjectMapper mapper = new ObjectMapper();
-        ObjectWriter writer = mapper.writerWithDefaultPrettyPrinter();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        ObjectWriter writer = mapper.writer();
 
-        try {
-            File file = new File(filePath);
-
-            File parentDir = file.getParentFile();
-            if (parentDir != null && !parentDir.exists()) {
-                parentDir.mkdirs();
-            }
-
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-
-            writer.writeValue(file, processedOrder);
+        try (FileWriter fileWriter = new FileWriter(filePath, true);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
+            writer.writeValue(bufferedWriter, processedOrder);
+            bufferedWriter.newLine();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error writing to file: {}", e.getMessage());
         }
     }
 }
