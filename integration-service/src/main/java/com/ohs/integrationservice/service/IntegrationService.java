@@ -18,6 +18,7 @@ import product.Product;
 import user.User;
 
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Service
@@ -33,7 +34,6 @@ public class IntegrationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IntegrationService.class);
 
-    private static final DateTimeFormatter INPUT_DATE_FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
     private static final DateTimeFormatter OUTPUT_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public IntegrationService(OrderServiceClient orderServiceClient, UserServiceClient userServiceClient, ProductServiceClient productServiceClient, JSONFileWriter outputWriter) {
@@ -82,11 +82,13 @@ public class IntegrationService {
                 .setQuantity(order.getQuantity())
                 .build();
 
+        ZonedDateTime createdDateZone = ZonedDateTime.parse(order.getDateCreated(), DateTimeFormatter.ISO_ZONED_DATE_TIME);
+
         Order.CreateOrderRequest orderRequest = Order.CreateOrderRequest.newBuilder()
                 .addProducts(productDetails)
                 .setUserPid(userPid)
-                .setDateCreated(StringValue.of(order.getDateCreated())) //recheck conversion
-                .setStatus(Order.OrderStatus.valueOf(String.valueOf(order.getOrderStatus())))
+                .setDateCreated(StringValue.of(createdDateZone.format(OUTPUT_DATE_FORMATTER)))
+                .setStatus(Order.OrderStatus.valueOf(order.getOrderStatus()))
                 .setPricePerUnit(productResponse.getPricePerUnit())
                 .setQuantity(Integer.parseInt(String.valueOf(order.getQuantity())))
                 .setDateDelivered(StringValue.of(LocalDate.now().format(OUTPUT_DATE_FORMATTER)))

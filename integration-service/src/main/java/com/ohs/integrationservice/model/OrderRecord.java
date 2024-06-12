@@ -18,5 +18,5 @@ public class OrderRecord {
     private String dateCreated;
     private int quantity;
     private String fullName;
-    private String orderStatus;
+    private int orderStatus;
 }

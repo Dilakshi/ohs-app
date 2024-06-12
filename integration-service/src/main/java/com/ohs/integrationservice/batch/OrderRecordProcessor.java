@@ -1,23 +1,21 @@
 package com.ohs.integrationservice.batch;
 
 import com.ohs.integrationservice.model.OrderRecord;
+import com.ohs.integrationservice.model.ProcessedOrder;
 import com.ohs.integrationservice.service.IntegrationService;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.batch.item.ItemProcessor;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
-public class OrderRecordProcessor implements ItemProcessor<OrderRecord, OrderRecord> {
+public class OrderRecordProcessor implements ItemProcessor<OrderRecord, ProcessedOrder> {
 
-    private IntegrationService integrationService;
+    private final IntegrationService integrationService;
+
+    public OrderRecordProcessor(IntegrationService integrationService) {
+        this.integrationService = integrationService;
+    }
 
     @Override
-    public OrderRecord process(OrderRecord orderRecord){
-        integrationService.processOrder(orderRecord);
-        return orderRecord;
+    public ProcessedOrder process(OrderRecord orderRecord){
+        return integrationService.processOrder(orderRecord);
     }
 
 }
